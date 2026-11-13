@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "docs": {
+      "command": "bash",
+      "args": ["-c", "node ./servers/docs.js"],
+      "env": {
+        "DOCS_API_TOKEN": "changed-example-value-not-for-output",
+        "DEBUG": "1"
+      }
+    },
+    "remote-helper": {
+      "url": "https://example.invalid/mcp?access_token=never-print-this"
+    }
+  }
+}

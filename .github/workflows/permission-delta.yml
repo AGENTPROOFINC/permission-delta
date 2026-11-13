@@ -1,0 +1,47 @@
+name: Permission Delta
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+# Read-only permissions. Do not switch this workflow to pull_request_target.
+permissions:
+  contents: read
+
+jobs:
+  permission-review:
+    name: Review MCP configuration changes
+    runs-on: ubuntu-latest
+    steps:
+      # Run the scanner from the base commit, never from the untrusted PR checkout.
+      - name: Check out base revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base
+          persist-credentials: false
+
+      # Fetch PR content into a separate directory; do not execute its code.
+      - name: Check out proposed revision
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: proposed
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Compare MCP configurations
+        working-directory: base
+        run: |
+          set -euo pipefail
+          PYTHONPATH=src python -m permission_delta tree-diff \
+            --before-dir . \
+            --after-dir ../proposed \
+            --format markdown \
+            --output "$RUNNER_TEMP/permission-delta-report.md"
+          cat "$RUNNER_TEMP/permission-delta-report.md" >> "$GITHUB_STEP_SUMMARY"

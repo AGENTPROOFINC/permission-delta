@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "docs": {
+      "command": "node",
+      "args": ["./servers/docs.js"],
+      "env": {
+        "DOCS_API_TOKEN": "example-value-not-for-output"
+      }
+    }
+  }
+}
