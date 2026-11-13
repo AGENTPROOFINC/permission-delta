@@ -11,7 +11,8 @@
 
 ## v0.2 — repository validation
 
-- [ ] Test against 10–20 real, public MCP configuration examples.
+- [x] Initial compatibility pass across 17 public MCP configuration examples from five repositories; see [VALIDATION.md](VALIDATION.md).
+- [ ] Validate against real repository history with maintainer permission; documentation examples do not establish user value or real-world detection quality.
 - [ ] Add more config fixtures and regression tests.
 - [ ] Improve discovery for nested and less common MCP config formats.
 - [ ] Pin GitHub Actions dependencies to reviewed commit SHAs.
