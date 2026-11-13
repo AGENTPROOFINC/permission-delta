@@ -110,6 +110,8 @@ The repository workflows at `.github/workflows/permission-delta.yml` and `.githu
 
 These checks are intentionally narrow. They do not establish whether a server is trustworthy, whether a URL is safe, what tools a server exposes at runtime, or whether an agent can escape its sandbox.
 
+See [VALIDATION.md](VALIDATION.md) for the initial public-config compatibility pass and its limits.
+
 ## Development
 
 Run the test suite:
