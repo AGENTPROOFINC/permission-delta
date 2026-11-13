@@ -76,7 +76,7 @@ Directories such as `.git`, `.venv`, `node_modules`, `dist`, and `build` are exc
 
 ## GitHub Action
 
-Permission Delta includes a composite action in `action.yml`. After this repository is public (or access is otherwise shared with your repository), add one step to a pull-request workflow:
+Permission Delta includes a composite action in `action.yml`. After the public `v0.1.0` release is available, add one step to a pull-request workflow:
 
 ```yaml
 name: Permission Delta
@@ -87,12 +87,12 @@ jobs:
   permission-review:
     runs-on: ubuntu-latest
     steps:
-      - uses: AGENTPROOFINC/permission-delta@<reviewed-commit-sha>
+      - uses: AGENTPROOFINC/permission-delta@v0.1.0
         with:
           fail-on: never
 ```
 
-Pin the action to a reviewed full commit SHA. The default `never` mode posts an advisory summary; `low`, `medium`, or `high` can make findings at that level fail the check.
+For stricter supply-chain pinning, replace `v0.1.0` with the full commit SHA shown on the release page. The default `never` mode posts an advisory summary; `low`, `medium`, or `high` can make findings at that level fail the check.
 
 The action checks out the pull request base and proposed snapshots separately, runs the scanner from the trusted action source, and adds a sanitized report to the workflow summary. It does not execute code from the proposed revision. Its workflow token only needs `contents: read`; it does not approve, reject, or merge pull requests. Do not use `pull_request_target`.
 
