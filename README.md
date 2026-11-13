@@ -74,16 +74,29 @@ permission-delta tree-diff --before-dir ./baseline --after-dir ./proposed
 
 Directories such as `.git`, `.venv`, `node_modules`, `dist`, and `build` are excluded.
 
-## GitHub Actions prototype
+## GitHub Action
 
-A sample workflow is provided at `.github/workflows/permission-delta.yml`. It checks out the base revision and proposed revision separately, runs the scanner from the base revision, and appends a sanitized report to the workflow summary. Its repository token is read-only and it does not execute code from the proposed revision.
+Permission Delta includes a composite action in `action.yml`. After this repository is public (or access is otherwise shared with your repository), add one step to a pull-request workflow:
 
-Before using this workflow in a high-assurance production setting:
+```yaml
+name: Permission Delta
+on: pull_request
+permissions:
+  contents: read
+jobs:
+  permission-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: AGENTPROOFINC/permission-delta@<reviewed-commit-sha>
+        with:
+          fail-on: never
+```
 
-1. Pin third-party actions to reviewed full commit SHAs rather than mutable version tags.
-2. Review the workflow and permissions in the context of your repository.
-3. Test fork pull requests, deleted fork repositories, renames, and repositories with unusual JSON layouts.
-4. Decide whether the workflow should be advisory or enforce a carefully tested policy.
+Pin the action to a reviewed full commit SHA. The default `never` mode posts an advisory summary; `low`, `medium`, or `high` can make findings at that level fail the check.
+
+The action checks out the pull request base and proposed snapshots separately, runs the scanner from the trusted action source, and adds a sanitized report to the workflow summary. It does not execute code from the proposed revision. Its workflow token only needs `contents: read`; it does not approve, reject, or merge pull requests. Do not use `pull_request_target`.
+
+The repository workflows at `.github/workflows/permission-delta.yml` and `.github/workflows/tests.yml` demonstrate the configuration-review and test checks. Both third-party actions are pinned to full commit SHAs.
 
 ## Initial detection coverage
 
@@ -102,8 +115,7 @@ These checks are intentionally narrow. They do not establish whether a server is
 Run the test suite:
 
 ```bash
-python -m unittest discover -s tests -v
+PYTHONPATH=src python -m unittest discover -s tests -v
 ```
 
 Contributions should include tests and must not add command execution, network access, secret-value output, or unreviewed auto-blocking behavior.
-
