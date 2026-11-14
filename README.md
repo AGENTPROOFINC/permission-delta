@@ -8,6 +8,33 @@ Permission Delta compares two JSON configuration snapshots, identifies changes t
 
 > **Important:** This is an early heuristic tool, not a security certification, complete MCP validator, runtime monitor, or enforcement gateway. A warning is not proof of a vulnerability, and no finding is not proof that a configuration is safe.
 
+## Fastest trial: GitHub Actions
+
+If you already have a `pull_request` workflow, add this step and set the workflow permission to `contents: read`:
+
+```yaml
+- uses: AGENTPROOFINC/permission-delta@v0.1.0
+```
+
+No separate checkout step, Python installation, or repository secret is required. The action compares the pull request's base and proposed snapshots and writes an advisory report to the Actions workflow summary. `fail-on` defaults to `never`, so findings do not fail the check.
+
+For a first run, create `.github/workflows/permission-delta.yml` with this complete workflow:
+
+```yaml
+name: Permission Delta
+on:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  permission-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: AGENTPROOFINC/permission-delta@v0.1.0
+```
+
+Then open a pull request that changes an MCP configuration file. [See a concrete command-change example](examples/command-shift/README.md).
+
 ## Safety and privacy boundaries
 
 - Reads JSON files only.
@@ -74,25 +101,11 @@ permission-delta tree-diff --before-dir ./baseline --after-dir ./proposed
 
 Directories such as `.git`, `.venv`, `node_modules`, `dist`, and `build` are excluded.
 
-## GitHub Action
+## GitHub Action details
 
-Permission Delta includes a composite action in `action.yml`. After the public `v0.1.0` release is available, add one step to a pull-request workflow:
+The public [`v0.1.0` release](https://github.com/AGENTPROOFINC/permission-delta/releases/tag/v0.1.0) is ready to use. For stricter supply-chain pinning, replace the tag in the workflow above with the full commit SHA shown on the release page.
 
-```yaml
-name: Permission Delta
-on: pull_request
-permissions:
-  contents: read
-jobs:
-  permission-review:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: AGENTPROOFINC/permission-delta@v0.1.0
-        with:
-          fail-on: never
-```
-
-For stricter supply-chain pinning, replace `v0.1.0` with the full commit SHA shown on the release page. The default `never` mode posts an advisory summary; `low`, `medium`, or `high` can make findings at that level fail the check.
+The default `fail-on` mode is `never`, so findings appear as an advisory summary without failing the check. Set it to `low`, `medium`, or `high` to fail when the report contains findings at or above that severity.
 
 The action checks out the pull request base and proposed snapshots separately, runs the scanner from the trusted action source, and adds a sanitized report to the workflow summary. It does not execute code from the proposed revision. Its workflow token only needs `contents: read`; it does not approve, reject, or merge pull requests. Do not use `pull_request_target`.
 
@@ -121,3 +134,4 @@ PYTHONPATH=src python -m unittest discover -s tests -v
 ```
 
 Contributions should include tests and must not add command execution, network access, secret-value output, or unreviewed auto-blocking behavior.
+
