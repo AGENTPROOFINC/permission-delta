@@ -33,7 +33,7 @@ jobs:
       - uses: AGENTPROOFINC/permission-delta@v0.1.0
 ```
 
-Then open a pull request that changes an MCP configuration file. [See a concrete command-change example](examples/command-shift/README.md).
+Then open a pull request that changes an MCP configuration file. [See a concrete command-change example](examples/command-shift/README.md) or the one-page [maintainer trial guide](TRIAL.md).
 
 ## Safety and privacy boundaries
 
@@ -134,4 +134,3 @@ PYTHONPATH=src python -m unittest discover -s tests -v
 ```
 
 Contributions should include tests and must not add command execution, network access, secret-value output, or unreviewed auto-blocking behavior.
-
